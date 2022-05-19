@@ -7,13 +7,19 @@ from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboa
 bot = telepot.Bot('5319724716:AAElD0JgkyeEWdGxW5g0Y0MQdBnlRO7BY_I')
 pompa={}
 answered=[]
+mustcheck=[]
 def sortbynumber(number):
     buses=bus.getUpdate()
     for b in buses:
         if b[0]==number:
             return b
-def sort(number):
-    buses=bus.getUpdate()
+def updatebynumber(number, buses):
+    
+    for b in buses:
+        if b[0]==number:
+            return b
+def sort(number, buses):
+    
     pprint(len(buses))
     crrct=[]
     for b in buses:
@@ -105,7 +111,7 @@ def handle(msg):
     if text.startswith('/bus '):
         try:
             bot.sendMessage(idd, 'Yoxlanılır')
-            c=sort(text[4:].strip())
+            c=sort(text[4:].strip(), buses)
             pompa[idd]=c
             bot.sendMessage(idd, 'Hansı istiqamət', reply_markup=InlineKeyboardMarkup( inline_keyboard=[ [InlineKeyboardButton(text=c[0][0], callback_data='1'), InlineKeyboardButton(text=c[0][1], callback_data='2')]]))
         except:
@@ -131,29 +137,45 @@ def callbackQuery(query):
 
     answered.append(query['message']['message_id'])
     bot.answerCallbackQuery(query['id'], 'Qəbul edildi')
-    if query['data'].startswith('b'):
-        d=sortbynumber(query['data'][1:])
+    if query['data'].startswith('c'):
+        d=updatebynumber(query['data'][1:], buses)
         bot.sendLocation(idd, d[7].replace(',', '.'), d[8].replace(',', '.'),
-                             reply_markup=InlineKeyboardMarkup( inline_keyboard=[[InlineKeyboardButton(text='Yenilə', callback_data='b'+d[1])]]))
+                             reply_markup=InlineKeyboardMarkup( inline_keyboard=[[
+                                 InlineKeyboardButton(text='Yenilə', callback_data='b'+d[1])]]))
+    
+        bot.sendMessage(idd, 'Göndərildi')
+    if query['data'].startswith('b'):
+        d=updatebynumber(query['data'][1:], buses)
+        mass=bot.sendLocation(idd, d[7].replace(',', '.'), d[8].replace(',', '.'), live_period=360)
+        mustcheck.append([mass, time.time(), query['data'][1:]])
+    
         bot.sendMessage(idd, 'Göndərildi')
     if query['data']=='1':
         for d in c[1]:
             print(d[7], d[8])
             bot.sendLocation(idd, d[7].replace(',', '.'), d[8].replace(',', '.'),
-                             reply_markup=InlineKeyboardMarkup( inline_keyboard=[[InlineKeyboardButton(text='Yenilə', callback_data='b'+d[1])]]))
+                             reply_markup=InlineKeyboardMarkup( inline_keyboard=[[
+                                 InlineKeyboardButton(text='Yenilə', callback_data='b'+d[1])]]))
         bot.sendMessage(idd, 'Göndərildi')
     if query['data']=='2':
         for d in c[2]:
             print(d[7], d[8])
-            bot.sendLocation(idd, d[7].replace(',', '.'), d[8].replace(',', '.'), reply_markup=InlineKeyboardMarkup( inline_keyboard=[[InlineKeyboardButton(text='Yenilə', callback_data='b'+d[1])]]))
+            bot.sendLocation(idd, d[7].replace(',', '.'), d[8].replace(',', '.'), reply_markup=InlineKeyboardMarkup( inline_keyboard=[[
+                                 InlineKeyboardButton(text='Yenilə', callback_data='b'+d[1])]]))
         bot.sendMessage(idd, 'Göndərildi')
-updates = bot.getUpdates()
-
-if updates:
-    last_update_id = updates[-1]['update_id']
-    bot.getUpdates(offset=last_update_id+1)
 bot.message_loop({'chat': handle, 'callback_query': callbackQuery})
 while True:
-	time.sleep(10)
+    buses=bus.getUpdate()
+    
+    for a in mustcheck:
+            if time.time()-a[1]>360:
+                break
+            else:
+                d=updatebynumber(a[2], buses)
+                try:
+                    bot.editMessageLiveLocation((a[0]['chat']['id'], a[0]['message_id']), d[7].replace(',', '.'), d[8].replace(',', '.'))
+                except:
+                    pass
+    time.sleep(2)
 
 
