@@ -165,8 +165,10 @@ def callbackQuery(query):
         bot.sendMessage(idd, 'Göndərildi')
 bot.message_loop({'chat': handle, 'callback_query': callbackQuery})
 while True:
-    buses=bus.getUpdate()
-    
+    try:
+        buses=bus.getUpdate()
+    except:
+        pass
     for a in mustcheck:
             if time.time()-a[1]>360:
                 mustcheck.remove(a)
