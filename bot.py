@@ -169,13 +169,13 @@ while True:
     
     for a in mustcheck:
             if time.time()-a[1]>360:
-                break
+                mustcheck.remove(a)
             else:
                 d=updatebynumber(a[2], buses)
                 try:
                     bot.editMessageLiveLocation((a[0]['chat']['id'], a[0]['message_id']), d[7].replace(',', '.'), d[8].replace(',', '.'))
                 except:
-                    pass
+                    print('fail')
     time.sleep(2)
 
 
