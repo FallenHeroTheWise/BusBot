@@ -171,7 +171,11 @@ while True:
             if time.time()-a[1]>360:
                 mustcheck.remove(a)
             else:
-                d=updatebynumber(a[2], buses)
+                try:
+                    d=updatebynumber(a[2], buses)
+                except:
+                    print('bus disappeared')
+                    mustcheck.remove(a)
                 try:
                     bot.editMessageLiveLocation((a[0]['chat']['id'], a[0]['message_id']), d[7].replace(',', '.'), d[8].replace(',', '.'))
                 except:
