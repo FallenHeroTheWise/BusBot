@@ -6,7 +6,7 @@ from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 from getapi import get_api
 from dataclasses import dataclass
 
-bot = telepot.Bot('5319724716:AAElD0JgkyeEWdGxW5g0Y0MQdBnlRO7BY_I')
+bot = telepot.Bot('<API_KEY>')
 message_ids = {}
 answered = []
 must_check = []
