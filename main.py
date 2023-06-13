@@ -106,9 +106,6 @@ def get_update():
     return buses1
 
 
-print(get_update()[1][-1])
-
-
 def updatebynumber(number, buses: Buses):
     for b in buses:
 
